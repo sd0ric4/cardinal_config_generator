@@ -26,9 +26,15 @@
 
 <style scoped></style>
 
-<script setup>
-import { ref, watch } from 'vue'
-const items = [
+<script setup lang="ts">
+import { ref, watch, type Ref } from 'vue'
+
+interface Item {
+  title: string
+  value: string
+}
+
+const items: Item[] = [
   {
     title: 'Foo',
     value: 'foo'
@@ -47,8 +53,8 @@ const items = [
   }
 ]
 
-const drawer = ref(false)
-const group = ref(null)
+const drawer: Ref<boolean> = ref(false)
+const group: Ref<string | null> = ref(null)
 
 watch(group, () => {
   drawer.value = false
