@@ -13,7 +13,7 @@
       ></v-app-bar-nav-icon>
     </template>
 
-    <v-app-bar-title id="code-blocks">config.json生成器</v-app-bar-title>
+    <v-app-bar-title id="code-blocks">Sm4加密解密</v-app-bar-title>
   </v-app-bar>
   <v-navigation-drawer
     v-model="drawer"
@@ -36,20 +36,8 @@ interface Item {
 
 const items: Item[] = [
   {
-    title: 'Foo',
-    value: 'foo'
-  },
-  {
-    title: 'Bar',
-    value: 'bar'
-  },
-  {
-    title: 'Fizz',
-    value: 'fizz'
-  },
-  {
-    title: 'Buzz',
-    value: 'buzz'
+    title: 'sm4',
+    value: 'sm4'
   }
 ]
 

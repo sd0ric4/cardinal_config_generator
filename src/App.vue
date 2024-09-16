@@ -3,13 +3,13 @@
     <AppBar />
 
     <v-main class="main-background">
-      <JsonSchemaForm />
+      <Sm4App />
     </v-main>
   </v-layout>
 </template>
 <script setup>
 import AppBar from './components/AppBar.vue'
-import JsonSchemaForm from './components/JsonSchemaForm.vue'
+import Sm4App from './components/Sm4App.vue'
 </script>
 <style>
 .main-background {
