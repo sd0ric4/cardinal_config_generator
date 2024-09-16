@@ -26,6 +26,8 @@
         append-inner-icon="mdi-refresh"
         @click:append-inner="handleGenerateKey"
         placeholder="请输入密钥喵"
+        @change="validateKey"
+        :error-messages="keyError"
         v-model="keyString"
       ></v-text-field>
       <v-row justify="center">
@@ -62,10 +64,16 @@ const plaintext = computed({
 })
 const output = ref('')
 const keyString = computed({
-  get: () => store.keyString,
+  get: () => {
+    return store.keyString || ''
+  },
   set: (value) => {
-    store.keyString = value as string
-    store.key = store.string_to_key(value)
+    if (typeof value === 'string' && value.trim() !== '') {
+      store.keyString = value
+      store.key = store.string_to_key(value)
+    } else {
+      console.error('Invalid key string')
+    }
   }
 })
 const key = computed({
@@ -75,6 +83,7 @@ const key = computed({
     store.keyString = store.key_to_string(value)
   }
 })
+
 const generateKey = (input?: string) => {
   store.generateKey(input)
 }
@@ -89,5 +98,29 @@ const encryptText = () => {
 
 const decryptText = () => {
   output.value = store.decryptText(plaintext.value, key.value || undefined)
+}
+
+const keyError = ref('')
+
+const validateKey = () => {
+  if (!keyString.value) {
+    keyError.value = 'Key string is missing.'
+    return
+  }
+
+  if (!/^([0-9a-fA-F]{2})+$/.test(keyString.value)) {
+    keyError.value = 'Key must be a hex string.'
+    return
+  }
+
+  const hexString = keyString.value
+  const bytes = new Uint8Array(hexString.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)))
+  const byteLength = bytes.length
+
+  if (byteLength % 16 !== 0) {
+    keyError.value = 'Key must be 16 bytes in length when converted to bytes.'
+  } else {
+    keyError.value = ''
+  }
 }
 </script>
