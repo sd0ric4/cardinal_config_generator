@@ -89,6 +89,7 @@ function Sbox(x: number): number {
 
 // 密钥扩展
 function keyExpansion(MK: number[]): number[] {
+  console.log('MK:', MK)
   const K = []
   for (let i = 0; i < 4; i++) {
     K[i] = MK[i] ^ FK[i]
@@ -207,7 +208,15 @@ export function genSM4key(input?: string): number[] {
     const key = new Uint8Array(keyLength)
     // 使用加密安全的随机数生成器填充密钥
     window.crypto.getRandomValues(key)
-    // 将 Uint8Array 转换为 number[]
-    return Array.from(key)
+
+    // 将 Uint8Array 转换为 4 个 32 位整数
+    const words = []
+    for (let i = 0; i < key.length; i += 4) {
+      const word = (key[i] << 24) | (key[i + 1] << 16) | (key[i + 2] << 8) | key[i + 3]
+      words.push(word >>> 0) // 确保无符号整数
+    }
+
+    // 返回 4 个 32 位整数
+    return words
   }
 }

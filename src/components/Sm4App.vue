@@ -1,5 +1,15 @@
 <template>
   <v-container>
+    <v-parallax
+      class="rounded-xl"
+      src="http://alist.dn11.ch405.top:5244/d/home/share_files/json.png?sign=2naosqJcwH8W3PSIWArcVQ8mSz6KNHZ18nmG43UZ93E=:0"
+    >
+      <div class="d-flex flex-column fill-height justify-center align-center text-white">
+        <h1 class="text-h4 font-weight-thin mb-4">sm4加密解密</h1>
+        <h4 class="subheading">sm4加密解密工具</h4>
+      </div>
+    </v-parallax>
+    <v-spacer style="height: 2rem"></v-spacer>
     <v-form>
       <v-file-input label="File input"></v-file-input>
       <v-textarea
@@ -46,8 +56,25 @@ import { useSM4Store } from '@/stores/useSM4Store'
 
 const store = useSM4Store()
 
-const plaintext = ref('')
+const plaintext = computed({
+  get: () => store.plaintext,
+  set: (value) => (store.plaintext = value)
+})
 const output = ref('')
+const keyString = computed({
+  get: () => store.keyString,
+  set: (value) => {
+    store.keyString = value as string
+    store.key = store.string_to_key(value)
+  }
+})
+const key = computed({
+  get: () => store.key,
+  set: (value) => {
+    store.key = value as number[] // 确保 value 是 number[]
+    store.keyString = store.key_to_string(value)
+  }
+})
 const generateKey = (input?: string) => {
   store.generateKey(input)
 }
@@ -57,15 +84,10 @@ const handleGenerateKey = () => {
 }
 
 const encryptText = () => {
-  output.value = store.encryptText(plaintext.value, store.key)
+  output.value = store.encryptText(plaintext.value, key.value || undefined)
 }
 
 const decryptText = () => {
-  output.value = store.decryptText(plaintext.value, store.key)
+  output.value = store.decryptText(plaintext.value, key.value || undefined)
 }
-
-// 将数组key转为类似md5的字符串
-const keyString = computed(() => {
-  return store.key.map((num) => num.toString(16).padStart(2, '0')).join('')
-})
 </script>
