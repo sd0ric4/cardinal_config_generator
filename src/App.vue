@@ -3,13 +3,13 @@
     <AppBar />
 
     <v-main class="main-background">
-      <Sm4App />
+      <RouterView />
     </v-main>
   </v-layout>
 </template>
 <script setup>
 import AppBar from './components/AppBar.vue'
-import Sm4App from './components/Sm4App.vue'
+import { RouterView } from 'vue-router'
 </script>
 <style>
 .main-background {

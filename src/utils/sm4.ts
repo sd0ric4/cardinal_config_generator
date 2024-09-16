@@ -1,5 +1,14 @@
 // src/utils/sm4.ts
-import { createHash } from 'crypto-browserify'
+import CryptoJS from 'crypto-js'
+export interface SM4 {
+  sm4Encrypt(plaintext: number[], key: number[]): number[]
+  sm4Decrypt(ciphertext: number[], key: number[]): number[]
+  textToBytes(text: string): number[]
+  bytesToText(bytes: number[]): string
+  sm4EncryptLongText(plaintext: string, key: number[]): number[]
+  sm4DecryptLongText(ciphertext: number[], key: number[]): string
+  genSM4key(input?: string): number[]
+}
 /**
  * S盒
  * @see https://en.wikipedia.org/wiki/S-box
@@ -38,17 +47,33 @@ const CK = [
   0xa0a7aeb5, 0xbcc3cad1, 0xd8dfe6ed, 0xf4fb0209, 0x10171e25, 0x2c333a41, 0x484f565d, 0x646b7279
 ]
 
-// 线性变换 L
+/**
+ * 线性变换 L
+ * @param {number} x
+ * @returns {number}
+ * @see https://en.wikipedia.org/wiki/Linear_transformation
+ * @description L(x) = x ^ (x <<< 2) ^ (x <<< 10) ^ (x <<< 18) ^ (x <<< 24)
+ */
 function L(x: number): number {
   return x ^ rotl(x, 2) ^ rotl(x, 10) ^ rotl(x, 18) ^ rotl(x, 24)
 }
 
-// 非线性变换 L'
+/** 非线性变换 L'
+ * @param {number} x
+ * @returns {number}
+ * @description L'(x) = x ^ (x <<< 13) ^ (x <<< 23)
+ * @see https://en.wikipedia.org/wiki/Linear_transformation
+ */
 function LPrime(x: number): number {
   return x ^ rotl(x, 13) ^ rotl(x, 23)
 }
 
-// 左移函数
+/**
+ * 左循环移位
+ * @param {number} x  待移位的数
+ * @param {number} n  移位位数
+ * @returns  {number}  移位后的数
+ */
 function rotl(x: number, n: number): number {
   return ((x << n) & 0xffffffff) | (x >>> (32 - n))
 }
@@ -173,9 +198,9 @@ export function sm4DecryptLongText(ciphertext: number[], key: number[]): string 
 export function genSM4key(input?: string): number[] {
   if (input) {
     // 计算输入参数的 MD5 值
-    const hash = createHash('md5').update(input).digest()
-    // 将 Buffer 转换为 number[]
-    return Array.from(hash)
+    const hash = CryptoJS.MD5(input)
+    // 将 CryptoJS 的 WordArray 转换为 number[]
+    return Array.from(CryptoJS.enc.Hex.parse(hash.toString()).words)
   } else {
     // SM4 密钥长度为 128 位，即 16 字节
     const keyLength = 16

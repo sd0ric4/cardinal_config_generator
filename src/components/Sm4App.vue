@@ -1,48 +1,39 @@
 <template>
   <v-container>
-    <v-parallax
-      class="rounded-xl"
-      src="https://alist.ch405.top/d/home/share_files/json.png?sign=2naosqJcwH8W3PSIWArcVQ8mSz6KNHZ18nmG43UZ93E=:0"
-    >
-      <div class="d-flex flex-column fill-height justify-center align-center text-white">
-        <h1 class="text-h4 font-weight-thin mb-4">sm4 加密解密</h1>
-        <h4 class="subheading">SM4 Encryption and Decryption</h4>
-      </div>
-    </v-parallax>
-    <v-spacer style="height: 2rem"></v-spacer>
     <v-form>
+      <v-file-input label="File input"></v-file-input>
       <v-textarea
-        v-model="inputText"
         label="输入"
         outlined
         rows="5"
-        placeholder="Input text to encrypt or decrypt"
+        placeholder="请输入来加密或解密的文本"
+        v-model="plaintext"
       ></v-textarea>
       <v-spacer style="height: 1rem"></v-spacer>
       <v-text-field
-        v-model="inputKey"
         label="密钥"
         outlined
         append-inner-icon="mdi-refresh"
-        @click:append-inner="generateKey"
+        @click:append-inner="handleGenerateKey"
         placeholder="请输入密钥喵"
+        v-model="keyString"
       ></v-text-field>
       <v-row justify="center">
         <v-col cols="auto">
-          <v-btn @click="encryptText" color="primary">加密</v-btn>
+          <v-btn @click="encryptText">加密</v-btn>
         </v-col>
         <v-col cols="auto">
-          <v-btn @click="decryptText" color="primary">解密</v-btn>
+          <v-btn @click="decryptText">解密</v-btn>
         </v-col>
       </v-row>
-      <v-spacer style="height: 20rem"></v-spacer>
+      <v-spacer style="height: 5rem"></v-spacer>
 
       <v-textarea
-        v-model="output"
         label="输出"
         outlined
         rows="5"
         placeholder="输出结果"
+        v-model="output"
       ></v-textarea>
       <v-spacer style="height: 10rem"></v-spacer>
     </v-form>
@@ -50,41 +41,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useSM4Store } from '@/stores/useSM4Store'
 
-const sm4Store = useSM4Store()
+const store = useSM4Store()
 
-const inputText = ref('')
-const inputKey = ref('')
-const encryptedText = ref('')
-const decryptedText = ref('')
+const plaintext = ref('')
 const output = ref('')
+const generateKey = (input?: string) => {
+  store.generateKey(input)
+}
+
+const handleGenerateKey = () => {
+  generateKey()
+}
 
 const encryptText = () => {
-  try {
-    encryptedText.value = sm4Store.encryptText(inputText.value, inputKey.value)
-    output.value = encryptedText.value
-  } catch (error) {
-    const errorMessage = (error as Error).message
-    console.error(errorMessage)
-    alert(errorMessage)
-  }
+  output.value = store.encryptText(plaintext.value, store.key)
 }
 
 const decryptText = () => {
-  try {
-    decryptedText.value = sm4Store.decryptText(encryptedText.value, inputKey.value)
-    output.value = decryptedText.value
-  } catch (error) {
-    const errorMessage = (error as Error).message
-    console.error(errorMessage)
-    alert(errorMessage)
-  }
+  output.value = store.decryptText(plaintext.value, store.key)
 }
-const generateKey = () => {
-  let keyHex = ''
-  keyHex = useSM4Store().generateHexKey()
-  inputKey.value = keyHex
-}
+
+// 将数组key转为类似md5的字符串
+const keyString = computed(() => {
+  return store.key.map((num) => num.toString(16).padStart(2, '0')).join('')
+})
 </script>

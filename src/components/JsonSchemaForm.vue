@@ -2,7 +2,7 @@
   <v-container>
     <v-parallax
       class="rounded-xl"
-      src="http://nas.ch405.top:5244/d/home/share_files/json.png?sign=2naosqJcwH8W3PSIWArcVQ8mSz6KNHZ18nmG43UZ93E=:0"
+      src="http://alist.dn11.ch405.top:5244/d/home/share_files/json.png?sign=2naosqJcwH8W3PSIWArcVQ8mSz6KNHZ18nmG43UZ93E=:0"
     >
       <div class="d-flex flex-column fill-height justify-center align-center text-white">
         <h1 class="text-h4 font-weight-thin mb-4">config.json Generator</h1>
