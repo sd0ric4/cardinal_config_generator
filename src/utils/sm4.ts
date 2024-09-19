@@ -1,5 +1,7 @@
 // src/utils/sm4.ts
 import CryptoJS from 'crypto-js'
+
+type ProgressCallback = (progress: number) => void
 export interface SM4 {
   sm4Encrypt(plaintext: number[], key: number[]): number[]
   sm4Decrypt(ciphertext: number[], key: number[]): number[]
@@ -89,7 +91,6 @@ function Sbox(x: number): number {
 
 // 密钥扩展
 function keyExpansion(MK: number[]): number[] {
-  console.log('MK:', MK)
   const K = []
   for (let i = 0; i < 4; i++) {
     K[i] = MK[i] ^ FK[i]
@@ -167,29 +168,49 @@ function wordArrayToBytes(words: number[]): number[] {
   return bytes
 }
 
-export function sm4EncryptLongText(plaintext: string, key: number[]): number[] {
+export function sm4EncryptLongText(
+  plaintext: string,
+  key: number[],
+  progressCallback?: ProgressCallback
+): number[] {
   let plaintextBytes = textToBytes(plaintext)
   plaintextBytes = pkcs7Padding(plaintextBytes) // 填充数据
   const ciphertext: number[] = []
+  const totalBlocks = plaintextBytes.length / 16
 
   // 按 16 字节分块加密
   for (let i = 0; i < plaintextBytes.length; i += 16) {
     const block = plaintextBytes.slice(i, i + 16)
     const encryptedBlock = sm4Encrypt(blockToWordArray(block), key)
     ciphertext.push(...wordArrayToBytes(encryptedBlock))
+
+    // 更新进度
+    if (progressCallback) {
+      progressCallback((i / 16 + 1) / totalBlocks)
+    }
   }
 
   return ciphertext
 }
 
-export function sm4DecryptLongText(ciphertext: number[], key: number[]): string {
+export function sm4DecryptLongText(
+  ciphertext: number[],
+  key: number[],
+  progressCallback?: ProgressCallback
+): string {
   const plaintext: number[] = []
+  const totalBlocks = ciphertext.length / 16
 
   // 按 16 字节分块解密
   for (let i = 0; i < ciphertext.length; i += 16) {
     const block = ciphertext.slice(i, i + 16)
     const decryptedBlock = sm4Decrypt(blockToWordArray(block), key)
     plaintext.push(...wordArrayToBytes(decryptedBlock))
+
+    // 更新进度
+    if (progressCallback) {
+      progressCallback((i / 16 + 1) / totalBlocks)
+    }
   }
 
   const unpaddedPlaintext = pkcs7Unpadding(plaintext) // 去除填充
